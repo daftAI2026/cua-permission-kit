@@ -8,17 +8,7 @@
 提供设备控制与录屏授权卡，引导用户进入系统设置，展示宿主传入的权限状态。
 独立社区项目，不隶属于 OpenAI，也未获得其背书。
 
-## 使用
-
-```sh
-./script/build_and_run.sh
-swift test
-CUA_RUN_WINDOW_TESTS=1 swift test
-```
-
-通过 Swift Package Manager 接入，部署目标为 macOS 12+，无外部依赖。
-部署目标不代表已在所有 macOS 版本上完成运行验收。
-完整接入代码与 API 见 [英文说明](README.md#integration)。
+## 功能
 
 - 两张卡：设备控制和数据访问、录屏与系统录音。
 - 旧系统按版本显示辅助功能、屏幕录制。
@@ -26,6 +16,29 @@ CUA_RUN_WINDOW_TESTS=1 swift test
 - 保留原始卡片 token、拖拽行和弹簧动画。
 - 录屏图标从系统读取；缺失时使用 SF Symbol。
 - Demo 控制区独立使用 Radix 色阶与集中式 token。
+
+## 快速开始
+
+准备好 Xcode 命令行工具后，运行：
+
+```sh
+git clone https://github.com/daftAI2026/cua-permission-kit.git
+cd cua-permission-kit
+./script/build_and_run.sh
+```
+
+Demo 默认使用模拟模式。选择 **System Settings** 后才进入真实设置流程。
+通过 Swift Package Manager 接入，部署目标为 macOS 12+，无外部依赖。
+部署目标不代表已在所有 macOS 版本上完成运行验收。
+完整接入代码与 API 见 [英文说明](README.md#integration)。
+
+验证命令：
+
+```sh
+swift test
+CUA_RUN_WINDOW_TESTS=1 swift test # 需要交互式 macOS 会话
+swift build -c release
+```
 
 ## 什么时候显示授权卡
 
@@ -129,3 +142,13 @@ open "$APP"
 不需要 `sudo`、全局关闭 Gatekeeper、移除代码签名或重置 TCC。
 若系统显示旧 Demo 条目已开启，探针却仍未通过，先确认运行路径；
 只移除并重新添加该 Demo 的旧条目，不重置其他应用的权限。
+
+## 贡献
+
+阅读 [AGENTS.md](AGENTS.md)，了解项目边界、开发命令与验收要求。
+行为变更应附带回归测试。提交问题时，请提供 macOS 版本、构建提交和 Demo 目标。
+不要上传凭据或包含私人内容的截图。
+
+## 许可证
+
+MIT。见 [LICENSE](LICENSE) 与 [第三方声明](THIRD_PARTY_NOTICES.md)。

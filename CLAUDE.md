@@ -11,6 +11,7 @@ script/ - 缓存目录构建与启动入口
 Tests/ - 库与 Demo 独立测试（2 子目录：CUAPermissionKitTests、CUAPermissionDemoTests）
 </directory>
 <config>
+AGENTS.md - 贡献规则、权限边界与验收命令。
 Package.swift - 声明 macOS 12+ 库和测试目标。
 README.md - 英文接入、文案协议与安全边界。
 README.zh-CN.md - 中文能力与验收边界。
