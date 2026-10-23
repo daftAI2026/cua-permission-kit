@@ -3,7 +3,7 @@
 
 成员清单
 PermissionKind.swift: 稳定权限身份、版本化文案与独立设置路由。
-PermissionHandoffTarget.swift: 注入目标窗口几何与激活动作。
+PermissionHandoffTarget.swift: 注入目标几何；通过 NSWorkspace 前置已有设置实例。
 Diagnostics.swift: OSLog 调试探针，仅记录本进程事件与窗口布尔状态。
 PermissionConfiguration.swift: 声明应用身份与状态；沿用原始提示模板；中文末尾短语保持整体换行。
 PermissionPresenter.swift: 持有窗口与向导状态；返回动作等待当前飞行结束。
