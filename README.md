@@ -2,13 +2,14 @@
 
 **English** | [简体中文](README.zh-CN.md)
 
-<img src="Assets/DemoIcon.png" width="96" alt="CUA Permission Demo flying saucer icon">
+<img src="Assets/DemoIcon.png" width="128" height="128" alt="CUA Permission Kit black-and-white flying saucer logo">
 
-Native macOS permission cards and a draggable Settings handoff guide, extracted from Incodex.
+A Swift package for macOS permission onboarding, extracted from Incodex. It renders
+device-control and screen-recording cards, guides users to System Settings, and
+displays the permission state supplied by the host application.
 
 **Independent community project. Not affiliated with or endorsed by OpenAI.**
 CUA describes the computer-use workflow; this package does not ship OpenAI binaries, icons, or an authorization service.
-
 
 ## What is included
 
@@ -107,7 +108,9 @@ for a previous `activePermission` to the current card.
 ### Customization
 
 `PermissionConfiguration` accepts `applicationIcon`, `permissionIcon`, `rightToLeft`,
-and `localizedCopy: [String: String]`. Missing copy keys use English defaults.
+and `localizedCopy: [String: String]`. `language` selects built-in permission names
+and drag instructions; supply `localizedCopy` for the remaining interface text.
+Untranslated keys retain their defaults, which can be English.
 Supported keys:
 
 `title`, `body`, `permissionTitle`, `permissionDescription`, `repair`, `later`, `back`,
@@ -130,6 +133,10 @@ in that mode. Close the guide before releasing it or shutting down its host.
 swift test
 CUA_RUN_WINDOW_TESTS=1 swift test # interactive macOS session required
 ```
+
+The Demo uses `DemoSession.applicationName` as its display-name variable (default: `"Demo"`).
+Changing this value updates the card and its generated instructions, not the bundle ID
+or the application URL used for dragging.
 
 The Demo offers English, Chinese and RTL previews, two permission cards, a destination
 selector, simulated results and **Restart**. Its default destination is the Demo drop
@@ -171,8 +178,8 @@ The extracted card visual tokens and spring code remain unchanged. Radix colors,
 application-name injection and the multi-card default keyboard shortcut.
 This is source-block parity, not full pixel parity across macOS versions.
 
-Local acceptance on macOS 27.0.1 arm64: both real file drags into the Demo, independent
-completion, return animation and restart passed; 20 tests passed including seven
+Local verification on 2026-10-23, macOS 27.0.1 arm64: both real file drags into the Demo, independent
+completion, return animation and restart passed; 21 tests passed including seven
 opt-in window tests. Both real permission probes also passed after removing the stale
 Demo entry and legacy bundle; a development-signed rebuild retained access. This does
 not certify old OS versions, multi-monitor placement, or every authorization transition.
@@ -199,10 +206,12 @@ After changing the icon, save in Icon Composer, export the PNG, compile the ICNS
 ## Release boundary
 
 This repository distributes a Swift source package. The Demo is a locally built example,
-not a signed or notarized downloadable application. A first source preview must pass
+not a Developer ID-signed or notarized downloadable application. A first source preview must pass
 release compilation, the external README integration build, CI and the opt-in window
-suite. Real system authorization changes and broader OS/display acceptance are not
-covered by those gates; do not describe this preview as a fully validated TCC adapter.
+suite. Older macOS versions and multi-monitor placement remain unverified; these
+follow-up checks do not block the current source preview. The macOS 12 deployment
+target is a build setting, not evidence of runtime compatibility on every supported OS.
+The automated gates do not certify every system authorization transition.
 Tags and GitHub Releases require maintainer confirmation. No version tag is published yet.
 
 ## Library and Demo boundary

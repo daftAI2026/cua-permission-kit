@@ -2,7 +2,11 @@
 
 [English](README.md) | **简体中文**
 
-从 Incodex 提取的 macOS 原生授权卡。独立社区项目，不代表 OpenAI。
+<img src="Assets/DemoIcon.png" width="128" height="128" alt="CUA Permission Kit 黑白飞碟标志">
+
+从 Incodex 提取的 macOS 授权引导 Swift 包。
+提供设备控制与录屏授权卡，引导用户进入系统设置，展示宿主传入的权限状态。
+独立社区项目，不隶属于 OpenAI，也未获得其背书。
 
 ## 使用
 
@@ -12,7 +16,9 @@ swift test
 CUA_RUN_WINDOW_TESTS=1 swift test
 ```
 
-完整接入代码与 API 见 [英文说明](README.md)。
+通过 Swift Package Manager 接入，部署目标为 macOS 12+，无外部依赖。
+部署目标不代表已在所有 macOS 版本上完成运行验收。
+完整接入代码与 API 见 [英文说明](README.md#integration)。
 
 - 两张卡：设备控制和数据访问、录屏与系统录音。
 - 旧系统按版本显示辅助功能、屏幕录制。
@@ -46,6 +52,9 @@ CUA_RUN_WINDOW_TESTS=1 swift test
 
 ## 演示与真实授权
 
+`DemoSession.applicationName` 统一定义演示显示名，默认值为 `"Demo"`。
+修改该值会更新卡片名称与自动生成的提示，不改变 bundle ID 或拖拽的应用 URL。
+
 默认拖入 Demo 接收区，验证本应用的文件 URL。
 接收成功只模拟当前卡完成，不修改系统权限。
 卡片回飞后显示“已完成”，另一张卡继续可用。
@@ -65,8 +74,8 @@ Demo 从用户缓存目录运行，避免 Desktop 拖拽授权弹窗。
 
 ## 已验证与边界
 
-macOS 27.0.1 arm64 上实测两次原生拖拽、逐卡完成与重来。
-20 项测试通过，包含七项显式启用的窗口测试。
+2026-10-23 在 macOS 27.0.1 arm64 上实测两次原生拖拽、逐卡完成与重来。
+21 项测试通过，包含七项显式启用的窗口测试。
 八个原始视觉和动画代码块通过指纹校验。
 该校验不等于所有系统版本上的像素一致。
 
@@ -86,8 +95,11 @@ Incodex 原始实现只接入辅助功能卡，双卡是本次扩展。
 Xcode 27 构建原生分层图标，旧工具链使用静态 ICNS。
 图标仅属于 Demo，不改变权限卡系统图标。
 
-当前发布对象是 Swift 源码包，不是已签名公证的 Demo 安装包。
+当前发布对象是 Swift 源码包，不是使用 Developer ID 签名并公证的 Demo 安装包。
 源码预览验收包含 Release 构建、外部接入编译、CI 与窗口测试。
+旧版 macOS 与多屏定位属于后续验收项，不阻塞当前源码预览发布。
+macOS 12 部署目标只是构建配置，不构成各系统版本的运行兼容性证明。
+自动化验收不覆盖所有系统授权状态变更。
 正式 tag 和 GitHub Release 需维护者确认。
 
 [提取差异与待验收项](EXTRACTION_AUDIT.md)。
