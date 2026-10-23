@@ -5,9 +5,9 @@
 PermissionKind.swift: 稳定权限身份、版本化文案与独立设置路由。
 PermissionHandoffTarget.swift: 注入目标窗口几何与激活动作。
 Diagnostics.swift: OSLog 调试探针，仅记录本进程事件与窗口布尔状态。
-PermissionConfiguration.swift: 声明应用身份、可覆盖文案、类型化状态和事件。
-PermissionPresenter.swift: 持有窗口与向导状态；把用户事件交给调用方。
-PresenterTracking.swift: 扩展 Presenter，定位设置窗口并协调往返动画。
+PermissionConfiguration.swift: 声明应用身份与状态；沿用原始提示模板和语义片段。
+PermissionPresenter.swift: 持有窗口与向导状态；返回动作等待当前飞行结束。
+PresenterTracking.swift: 扩展 Presenter，定位目标窗口；恢复时清除本轮动作并复用初始窗口。
 PresenterSupport.swift: 提供窗口代理、拖拽源和坐标转换。
 InitialView.swift: 渲染初始授权卡与设置占位页。
 HelperView.swift: 渲染配置中的应用身份、拖拽行与箭头。

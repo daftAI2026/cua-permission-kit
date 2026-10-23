@@ -7,6 +7,52 @@ import XCTest
 @testable import CUAPermissionKit
 
 final class HandoffWindowTests: XCTestCase {
+    @MainActor func testPresentAfterPartialCompletionReusesWindow() throws {
+        guard ProcessInfo.processInfo.environment["CUA_RUN_WINDOW_TESTS"] == "1" else { throw XCTSkip("Opt-in visible window test") }
+        let presenter = PermissionPresenter(configuration: .init(applicationURL: Bundle.main.bundleURL, applicationName: "Fixture", permissions: [.deviceControl, .screenAndAudioRecording]), onEvent: { _ in }, onError: { XCTFail($0) })
+        defer { presenter.close() }
+        XCTAssertTrue(presenter.present())
+        let original = try XCTUnwrap(presenter.initialPanel)
+        defer { original.close() }
+        presenter.update(.granted)
+        XCTAssertTrue(presenter.present())
+        XCTAssertTrue(presenter.initialPanel === original, "Repeated present must not orphan the original window")
+        presenter.close()
+        XCTAssertFalse(original.isVisible)
+    }
+
+    @MainActor func testCompletedHandoffClearsDeferredReturn() throws {
+        guard ProcessInfo.processInfo.environment["CUA_RUN_WINDOW_TESTS"] == "1" else { throw XCTSkip("Opt-in visible window test") }
+        let presenter = PermissionPresenter(configuration: .init(applicationURL: Bundle.main.bundleURL, applicationName: "Fixture", permissions: [.deviceControl, .screenAndAudioRecording]), onEvent: { _ in }, onError: { XCTFail($0) })
+        defer { presenter.close() }
+        XCTAssertTrue(presenter.present())
+        presenter.state = "awaiting-user"
+        presenter.handleDragBegan()
+        presenter.returnToCard()
+        presenter.update(.granted)
+        XCTAssertTrue(presenter.returnRequested)
+        presenter.handleDragEnded()
+        XCTAssertEqual(presenter.grantedPermissions, [.deviceControl])
+        XCTAssertFalse(presenter.returnRequested, "A completed card must consume its deferred return")
+    }
+
+    @MainActor func testReturnDuringForwardFlightWaitsForCompletion() throws {
+        guard ProcessInfo.processInfo.environment["CUA_RUN_WINDOW_TESTS"] == "1" else { throw XCTSkip("Opt-in visible window test") }
+        guard !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion else { throw XCTSkip("Reduced motion completes immediately") }
+        let presenter = PermissionPresenter(configuration: .init(applicationURL: Bundle.main.bundleURL, applicationName: "Fixture"), onEvent: { _ in }, onError: { XCTFail($0) })
+        defer { presenter.close() }
+        XCTAssertTrue(presenter.present())
+        presenter.state = "awaiting-user"
+        presenter.sourceEndpoint = presenter.captureInitialEndpoint()
+        presenter.createHelper(frame: NSRect(x: 100, y: 100, width: 531, height: 110))
+        presenter.startForwardFlight()
+        let outgoing = try XCTUnwrap(presenter.flight)
+        presenter.returnToCard()
+        XCTAssertTrue(presenter.flight === outgoing, "Return must not orphan an active forward flight")
+        XCTAssertTrue(presenter.returnRequested)
+        XCTAssertFalse(presenter.returning)
+    }
+
     @MainActor func testHandoffHidesInitialWithoutChangingHostPolicy() throws {
         guard ProcessInfo.processInfo.environment["CUA_RUN_WINDOW_TESTS"] == "1" else { throw XCTSkip("Opt-in visible window test") }
         let app = NSApplication.shared

@@ -215,6 +215,7 @@ extension PermissionPresenter {
         flight = nil
         revealHelper()
         if completionRequested { finishGranted() }
+        else if returnRequested { returnRequested = false; startBackFlight() }
     }
 
     func startBackFlight() {
@@ -222,6 +223,7 @@ extension PermissionPresenter {
         guard !closed, !returning, !dragging, state == "awaiting-user",
               let initialView,
               let cardView else { return }
+        if flight != nil { returnRequested = true; return }
         guard setGuideActivationPolicy(.accessory) else { return }
         returning = true
         returnSequence += 1
@@ -300,6 +302,7 @@ extension PermissionPresenter {
     func restoreInitialPage(raiseBeforeHelperDisposal: Bool = false) {
         probe("restore-initial")
         guard !closed else { return }
+        returnRequested = false
         if completionRequested {
             grantedPermissions.insert(activePermission)
             probe("grant-return-complete")
@@ -310,6 +313,7 @@ extension PermissionPresenter {
         guard setGuideActivationPolicy(.accessory) else { return }
         if raiseBeforeHelperDisposal { initialPanel?.level = .floating }
         disposeHelper()
+        presented = true
         returning = false
         state = "pending"
         retryReady = true

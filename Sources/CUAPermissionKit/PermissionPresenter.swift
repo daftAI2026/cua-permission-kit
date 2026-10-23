@@ -72,7 +72,7 @@ public final class PermissionPresenter: NSObject {
     /// 返回授权卡，不声称权限已通过；拖拽未结束时延后执行。
     public func returnToCard() {
         guard !closed, state == "awaiting-user" else { return }
-        if dragging { returnRequested = true; return }
+        if dragging || flight != nil { returnRequested = true; return }
         startBackFlight()
     }
 
@@ -184,6 +184,8 @@ public final class PermissionPresenter: NSObject {
         case "error":
             guard setGuideActivationPolicy(.accessory) else { return }
             state = nextState
+            returnRequested = false
+            completionRequested = false
             returning = false
             stopTracking()
             stopBackFlightTimer()

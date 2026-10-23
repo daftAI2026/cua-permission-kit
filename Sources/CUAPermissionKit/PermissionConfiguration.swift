@@ -45,6 +45,23 @@ public struct PermissionConfiguration {
 
     func copy(for permission: PermissionKind) -> NSDictionary {
         let name = permission.displayName(language: language)
+        // 沿用 Incodex 的逐语言语义片段，只替换应用与权限身份。
+        let spans: [(String, String)]
+        if language.hasPrefix("zh") {
+            spans = [("将 ", "secondary"), (applicationName, "primary"),
+                     (" 拖到上方的“", "secondary"), (name, "primary"),
+                     ("”列表中，然后开启对应权限", "secondary")]
+        } else if language.hasPrefix("ar") {
+            spans = [("اسحب ", "secondary"), (applicationName, "primary"),
+                     (" إلى القائمة أعلاه لمنحه إذن ", "secondary"), (name, "primary")]
+        } else {
+            spans = [("Drag ", "secondary"), (applicationName, "primary"),
+                     (" to the list above to allow ", "secondary"), (name, "primary")]
+        }
+        let dragInstruction = spans.map { $0.0 }.joined()
+        let runs = spans.map { ["text": $0.0, "role": $0.1] }
+        let runsJSON = (try? JSONSerialization.data(withJSONObject: runs))
+            .flatMap { String(data: $0, encoding: .utf8) } ?? ""
         var values = [
             "title": "Allow Access",
             "body": "Choose which access to allow for \(applicationName).",
@@ -54,8 +71,8 @@ public struct PermissionConfiguration {
             "granted": language.hasPrefix("zh") ? "已完成" : "Allowed",
             "addedTitle": "Complete in System Settings",
             "addedBody": "Add \(applicationName) to the \(name) list.",
-            "dragInstruction": "Drag \(applicationName) into the \(name) list, then enable it.",
-            "dragInstructionRuns": "", "completeInSettings": "Complete in System Settings",
+            "dragInstruction": dragInstruction,
+            "dragInstructionRuns": runsJSON, "completeInSettings": "Complete in System Settings",
             "checking": "Checking…", "repairing": "Opening Settings…",
             "openSettings": "Open System Settings", "errorTitle": "Permission Not Available",
             "errorBody": "Check access in System Settings, then try again."
