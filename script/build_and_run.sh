@@ -14,7 +14,17 @@ pkill -x "$APP_NAME" >/dev/null 2>&1 || true
 swift build --product "$APP_NAME"
 BINARY="$(swift build --show-bin-path)/$APP_NAME"
 BUNDLE="$HOME/Library/Caches/org.cuapermissionkit.demo/$APP_NAME.app"
-mkdir -p "$BUNDLE/Contents/MacOS"
+mkdir -p "$BUNDLE/Contents/MacOS" "$BUNDLE/Contents/Resources"
+cp "$ROOT/Assets/DemoIcon.icns" "$BUNDLE/Contents/Resources/DemoIcon.icns"
+# Xcode 27 编译原生分层图标；旧工具链使用同源静态图标。
+XCODE_MAJOR="$(xcodebuild -version 2>/dev/null | sed -n 's/^Xcode \([0-9]*\).*/\1/p' || true)"
+if [[ "${XCODE_MAJOR:-0}" -ge 27 ]]; then
+    xcrun actool "$ROOT/Assets/DemoIcon.icon" --compile "$BUNDLE/Contents/Resources" \
+        --platform macosx --minimum-deployment-target 12.0 --app-icon DemoIcon \
+        --output-partial-info-plist "$BUNDLE/Contents/Resources/IconInfo.plist"
+else
+    rm -f "$BUNDLE/Contents/Resources/Assets.car"
+fi
 cp "$BINARY" "$BUNDLE/Contents/MacOS/$APP_NAME"
 cat > "$BUNDLE/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -23,6 +33,8 @@ cat > "$BUNDLE/Contents/Info.plist" <<PLIST
 <key>CFBundleExecutable</key><string>$APP_NAME</string>
 <key>CFBundleIdentifier</key><string>$BUNDLE_ID</string>
 <key>CFBundleName</key><string>CUA Permission Demo</string>
+<key>CFBundleIconFile</key><string>DemoIcon</string>
+<key>CFBundleIconName</key><string>DemoIcon</string>
 <key>CFBundlePackageType</key><string>APPL</string>
 <key>LSMinimumSystemVersion</key><string>12.0</string>
 <key>NSPrincipalClass</key><string>NSApplication</string>
