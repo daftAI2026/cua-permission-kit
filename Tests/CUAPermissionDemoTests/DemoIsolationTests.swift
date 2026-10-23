@@ -1,5 +1,5 @@
 // [INPUT]: 依赖 XCTest、AppKit 与演示目标。
-// [OUTPUT]: 验证 Dock 图标来源与设置模式拒绝模拟完成。
+// [OUTPUT]: 验证演示显示名、Dock 图标来源与设置模式拒绝模拟完成。
 // [POS]: 演示与真实授权状态的隔离回归测试。
 // [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
 import AppKit
@@ -7,6 +7,10 @@ import XCTest
 @testable import CUAPermissionDemo
 
 final class DemoIsolationTests: XCTestCase {
+    @MainActor func testDemoUsesShortDisplayName() {
+        XCTAssertEqual(DemoSession.applicationName, "Demo")
+    }
+
     @MainActor func testDockIconUsesExplicitResource() throws {
         let app = NSApplication.shared
         let previous = app.applicationIconImage

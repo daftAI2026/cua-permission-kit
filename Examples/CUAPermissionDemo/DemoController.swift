@@ -86,7 +86,7 @@ final class DemoController: NSObject, NSApplicationDelegate {
     @objc private func showEnglish() { show(copy: [:], rtl: false, language: "en") }
     @objc private func showChinese() {
         show(copy: [
-            "title": "允许访问", "body": "选择允许 CUA Permission Demo 使用的权限。",
+            "title": "允许访问", "body": "选择允许 \(DemoSession.applicationName) 使用的权限。",
             "repair": "允许", "later": "跳过", "back": "返回", "completeInSettings": "在系统设置中完成",
             "errorTitle": "模拟授权失败", "errorBody": "这是演示状态，没有修改系统权限。"
          ], rtl: false, language: "zh")

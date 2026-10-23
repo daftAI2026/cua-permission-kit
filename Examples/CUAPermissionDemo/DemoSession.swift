@@ -1,5 +1,5 @@
 // [INPUT]: 依赖 CUAPermissionKit 公共接口与系统只读权限查询。
-// [OUTPUT]: 提供 Demo 向导会话、模拟结果与目标适配。
+// [OUTPUT]: 提供统一演示显示名、向导会话、模拟结果与目标适配。
 // [POS]: Demo 到库的单向接入层；不定义授权卡视觉。
 // [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
 import AppKit
@@ -9,6 +9,8 @@ import OSLog
 
 @MainActor
 final class DemoSession {
+    static let applicationName = "Demo"
+
     private weak var window: NSWindow?
     private let reportStatus: (String) -> Void
     private let shouldCheckPermission: () -> Bool
@@ -38,7 +40,7 @@ final class DemoSession {
         stopPermissionCheck()
         presenter?.close()
         self.usesDemoTarget = usesDemoTarget
-        var configuration = PermissionConfiguration(applicationURL: Bundle.main.bundleURL, applicationName: "CUA Permission Demo", rightToLeft: rtl, localizedCopy: copy, permissions: [.deviceControl, .screenAndAudioRecording], language: language)
+        var configuration = PermissionConfiguration(applicationURL: Bundle.main.bundleURL, applicationName: Self.applicationName, rightToLeft: rtl, localizedCopy: copy, permissions: [.deviceControl, .screenAndAudioRecording], language: language)
         if usesDemoTarget {
             configuration.localizedCopy["dragInstruction"] = language == "zh" ? "将应用拖入 Demo 接收区。" : language == "ar" ? "اسحب التطبيق إلى منطقة الاختبار." : "Drag the app into the Demo drop area."
             configuration.handoffTarget = PermissionHandoffTarget(locate: { [weak self] in
