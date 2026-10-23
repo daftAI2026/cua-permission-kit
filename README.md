@@ -1,5 +1,7 @@
 # CUA Permission Kit
 
+**English** | [简体中文](README.zh-CN.md)
+
 <img src="Assets/DemoIcon.png" width="96" alt="CUA Permission Demo flying saucer icon">
 
 Native macOS permission cards and a draggable Settings handoff guide, extracted from Incodex.
@@ -7,7 +9,6 @@ Native macOS permission cards and a draggable Settings handoff guide, extracted 
 **Independent community project. Not affiliated with or endorsed by OpenAI.**
 CUA describes the computer-use workflow; this package does not ship OpenAI binaries, icons, or an authorization service.
 
-[中文说明](README.zh-CN.md)
 
 ## What is included
 
@@ -25,6 +26,23 @@ The deployment target is not a claim of runtime verification on every macOS vers
 Add `.package(path: "../cua-permission-kit")` to your package dependencies and
 `.product(name: "CUAPermissionKit", package: "cua-permission-kit")` to your target dependencies.
 No remote release or version tag is required for local integration.
+
+## When to show the guide
+
+Complete permission onboarding **before starting the app's main features**, especially
+screen capture and automation. This avoids starting work that macOS may interrupt
+with a permission prompt or a relaunch request.
+
+If your installer or launcher offers onboarding before the first main-app launch,
+add the **final installed app bundle** to System Settings, not the installer or helper.
+If the guide runs inside your app, launch only the onboarding UI first; start protected
+features after the actual host process confirms access. A helper's permissions are
+not proof that the main app is authorized.
+
+This can reduce an extra relaunch, but cannot guarantee a restart-free flow.
+Honor any macOS request to quit and reopen, especially for screen recording.
+Finish signing and installing the app before granting access; changing its identity
+or keeping multiple bundles with the same ID can invalidate the authorization.
 
 ## Integration
 
@@ -155,8 +173,9 @@ This is source-block parity, not full pixel parity across macOS versions.
 
 Local acceptance on macOS 27.0.1 arm64: both real file drags into the Demo, independent
 completion, return animation and restart passed; 20 tests passed including seven
-opt-in window tests. Real system authorization changes, recording-specific Settings
-placement, older OS versions and multi-monitor behavior remain separate acceptance gates.
+opt-in window tests. Both real permission probes also passed after removing the stale
+Demo entry and legacy bundle; a development-signed rebuild retained access. This does
+not certify old OS versions, multi-monitor placement, or every authorization transition.
 
 ## Attribution
 
@@ -203,3 +222,37 @@ only the Demo bundle, using the unique local Apple Development identity when
 available. Set `CUA_DEMO_SIGN_IDENTITY` when several identities exist. Without
 a development identity it uses ad-hoc signing, which may require reauthorization
 after rebuilding. The script never resets permission records.
+
+## Opening a trusted, unnotarized Demo
+
+No Developer ID-signed, Apple-notarized Demo is distributed by this project. A local
+Apple Development certificate, when available, is only a development signing identity;
+it does not make the Demo a notarized distribution. No Apple developer membership
+is required to build the source. To explicitly build with ad-hoc signing:
+
+```sh
+CUA_DEMO_SIGN_IDENTITY=- ./script/build_and_run.sh
+```
+
+If macOS blocks a **downloaded copy you have verified and trust**, the following steps
+remove the quarantine attribute and apply a new ad-hoc signature **to that Demo only**.
+This is not “removing the signature” and does not grant Accessibility or recording
+access. Do not run it for an app that already opens correctly, an untrusted download,
+or an app whose existing Developer ID signature you need to preserve.
+
+Quit the Demo first. Set `APP` to the exact copy you intend to run; this is the local
+build script's output path:
+
+```sh
+APP="$HOME/Library/Caches/org.cuapermissionkit.demo/CUAPermissionDemo.app"
+xattr -dr com.apple.quarantine "$APP"
+codesign --force --sign - "$APP"
+codesign --verify --strict "$APP"
+open "$APP"
+```
+
+Run this, if needed, **before** permission onboarding: re-signing changes the app's
+identity and may require granting access again. No `sudo`, global Gatekeeper change,
+`codesign --remove-signature`, or TCC reset is needed. If Settings shows an enabled
+stale Demo entry but the probe remains false, first confirm the running bundle path;
+remove and re-add only that Demo entry, never reset other apps' permissions.
