@@ -1,5 +1,5 @@
 // [INPUT]: 依赖 AppKit 的图像类型与 Foundation 的 URL。
-// [OUTPUT]: 提供应用配置、授权状态与用户事件。
+// [OUTPUT]: 提供应用配置、语义文案、授权状态与事件。
 // [POS]: 调用方与表现层的边界；调用方执行权限检查。
 // [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
 import AppKit
@@ -48,9 +48,11 @@ public struct PermissionConfiguration {
         // 沿用 Incodex 的逐语言语义片段，只替换应用与权限身份。
         let spans: [(String, String)]
         if language.hasPrefix("zh") {
+            // 不拆分末尾操作短语；沿用自然换行，不改原始视图几何。
+            let completion = "然后开启对应权限".map(String.init).joined(separator: "\u{2060}")
             spans = [("将 ", "secondary"), (applicationName, "primary"),
                      (" 拖到上方的“", "secondary"), (name, "primary"),
-                     ("”列表中，然后开启对应权限", "secondary")]
+                     ("”列表中，\(completion)", "secondary")]
         } else if language.hasPrefix("ar") {
             spans = [("اسحب ", "secondary"), (applicationName, "primary"),
                      (" إلى القائمة أعلاه لمنحه إذن ", "secondary"), (name, "primary")]

@@ -1,5 +1,5 @@
 // [INPUT]: 依赖权限类型与配置接口。
-// [OUTPUT]: 验证两项权限、版本名称与独立设置入口。
+// [OUTPUT]: 验证双卡名称、原句、不拆短语与设置入口。
 // [POS]: 双卡合同测试，不触碰系统权限。
 // [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
 import XCTest
@@ -9,7 +9,9 @@ final class PermissionKindTests: XCTestCase {
         let config = PermissionConfiguration(applicationURL: URL(fileURLWithPath: "/Applications/Test.app"), applicationName: "Test", permissions: [.deviceControl, .screenAndAudioRecording], language: "zh")
         for permission in config.permissions {
             let instruction = config.copy(for: permission)["dragInstruction"] as? String ?? ""
-            XCTAssertEqual(instruction, "将 Test 拖到上方的“\(permission.displayName(language: "zh"))”列表中，然后开启对应权限")
+            XCTAssertEqual(instruction.replacingOccurrences(of: "\u{2060}", with: ""), "将 Test 拖到上方的“\(permission.displayName(language: "zh"))”列表中，然后开启对应权限")
+            XCTAssertTrue(instruction.hasSuffix("然后开启对应权限".map(String.init).joined(separator: "\u{2060}")))
+            XCTAssertFalse(instruction.contains("\n"))
             let json = config.copy(for: permission)["dragInstructionRuns"] as? String ?? ""
             let runs = (try? JSONSerialization.jsonObject(with: Data(json.utf8))) as? [[String: String]]
             XCTAssertEqual(runs?.compactMap { $0["text"] }.joined(), instruction)
