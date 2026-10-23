@@ -82,7 +82,8 @@ map when adding top-level files or modules.
 
 Keep README prose technical and concise. Recommend onboarding before the main app
 starts protected features; do not promise that macOS will never require a restart.
-The English README is the full API reference; the Chinese README links to it.
+Use the Chinese README as the source for the English translation.
+Keep the full API reference in INTEGRATION.md; both README files link to it.
 
 A pushed source commit is not a packaged release. Do not create tags or GitHub
 Releases without explicit maintainer confirmation. Do not claim Developer ID signing

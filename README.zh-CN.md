@@ -34,7 +34,7 @@ cd cua-permission-kit
 Demo 默认使用模拟模式。选择 **System Settings** 后才进入真实设置流程。
 通过 Swift Package Manager 接入，部署目标为 macOS 12+，无外部依赖。
 部署目标不代表已在所有 macOS 版本上完成运行验收。
-完整接入代码与 API 见 [英文说明](README.md#integration)。
+完整接入代码与 API 见 [接入文档](INTEGRATION.md)。
 
 验证命令：
 
