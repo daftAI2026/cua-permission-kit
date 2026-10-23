@@ -1,5 +1,7 @@
 # CUA Permission Kit
 
+<img src="Assets/DemoIcon.png" width="96" alt="CUA Permission Demo flying saucer icon">
+
 Native macOS permission cards and a draggable Settings handoff guide, extracted from Incodex.
 
 **Independent community project. Not affiliated with or endorsed by OpenAI.**
@@ -80,6 +82,9 @@ Only your real permission check may send `.granted`. Closing/Skip does not revok
 `.awaitingUser` starts Settings tracking; `.error` shows the configured error copy.
 The current presenter emits `.allow`, `.retry`, and `.later` (including window close).
 `.close` is reserved for host adapters.
+`.error` is terminal for that attempt: close and create a new presenter to restart.
+Cancel permission checks when closing or changing cards; do not deliver a stale result
+for a previous `activePermission` to the current card.
 
 ### Customization
 
@@ -89,7 +94,7 @@ Supported keys:
 
 `title`, `body`, `permissionTitle`, `permissionDescription`, `repair`, `later`, `back`,
 `addedTitle`, `addedBody`, `dragInstruction`, `dragInstructionRuns`, `completeInSettings`,
-`checking`, `repairing`, `openSettings`, `errorTitle`, `errorBody`.
+`checking`, `repairing`, `openSettings`, `errorTitle`, `errorBody`, `granted`.
 
 `dragInstructionRuns` is a JSON array of `{ "text": "…", "role": "primary" | "secondary" }`.
 Its concatenated text must equal `dragInstruction`; invalid runs fall back to plain text.
@@ -113,8 +118,12 @@ selector, simulated results and **Restart**. Its default destination is the Demo
 area. Dropping the exact Demo application URL simulates completion of the selected card:
 it flies back, shows completed, and leaves the other card available. Completing both
 closes the guide. Restart resets only the demonstration, never system permissions.
+System Settings mode disables the Demo drop area; a simulated drop cannot complete
+a real Settings flow. Explicit “Simulate” buttons remain test controls, not permission proof.
 
-Select **System Settings** before opening a preview to use real Settings navigation.
+Select **System Settings** to use real Settings navigation. Changing the destination
+restarts an existing preview, so helper geometry, instructions and completion rules
+always use the displayed destination; system permissions are never reset.
 The optional read-only check uses `AXIsProcessTrusted` or
 `CGPreflightScreenCaptureAccess`; it never requests or resets authorization.
 A screen-capture preflight is not a separate guarantee of audio-only authorization.
@@ -140,12 +149,12 @@ not a claim to reproduce an unpublished CUA recording implementation.
 
 The extracted card visual tokens and spring code remain unchanged. Radix colors,
 0.5pt borders and centralized Demo tokens apply only to the control panel.
-`ExtractionParityTests` fingerprints five original visual/motion blocks, excluding
+`ExtractionParityTests` fingerprints eight original visual/motion blocks, excluding
 application-name injection and the multi-card default keyboard shortcut.
 This is source-block parity, not full pixel parity across macOS versions.
 
 Local acceptance on macOS 27.0.1 arm64: both real file drags into the Demo, independent
-completion, return animation and restart passed; 14 tests passed including three
+completion, return animation and restart passed; 19 tests passed including seven
 opt-in window tests. Real system authorization changes, recording-specific Settings
 placement, older OS versions and multi-monitor behavior remain separate acceptance gates.
 
@@ -157,3 +166,31 @@ The existing MIT copyright notices are retained in [LICENSE](LICENSE).
 This repository contains the extracted implementation, not OpenAI's proprietary CUA source.
 
 Radix palette attribution is in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+## Demo icon
+
+`Assets/DemoIcon.icon` is the editable Icon Composer source. It retains the supplied
+flying-saucer path and the maintainer's black-and-white glass treatment. `DemoIcon.png`
+is its exported preview; `DemoIcon.icns` is its compiled compatibility icon.
+The Demo loads its own bundle icon rather than a placeholder symbol.
+The run script compiles layered assets with Xcode 27; older toolchains use the static ICNS.
+After changing the icon, save in Icon Composer, export the PNG, compile the ICNS with
+`actool`, and update both exports together. The library has no dependency on these assets.
+
+## Release boundary
+
+This repository distributes a Swift source package. The Demo is a locally built example,
+not a signed or notarized downloadable application. A first source preview must pass
+release compilation, the external README integration build, CI and the opt-in window
+suite. Real system authorization changes and broader OS/display acceptance are not
+covered by those gates; do not describe this preview as a fully validated TCC adapter.
+Tags and GitHub Releases require maintainer confirmation. No version tag is published yet.
+
+## Library and Demo boundary
+
+Dependencies flow one way: `DemoController → DemoSession → CUAPermissionKit`.
+The controller composes Demo controls; the session owns target adaptation,
+simulated results, and read-only probes. Demo tokens, icons, and drop targets
+remain outside the library. Library and Demo tests use separate targets.
+
+[Source comparison and outstanding checks](EXTRACTION_AUDIT.md).
