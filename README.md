@@ -194,3 +194,12 @@ simulated results, and read-only probes. Demo tokens, icons, and drop targets
 remain outside the library. Library and Demo tests use separate targets.
 
 [Source comparison and outstanding checks](EXTRACTION_AUDIT.md).
+
+### Demo build identity
+
+Trash the legacy `dist/CUAPermissionDemo.app` before using the Run script.
+Duplicate bundle IDs can make Settings reopen the older build. The script signs
+only the Demo bundle, using the unique local Apple Development identity when
+available. Set `CUA_DEMO_SIGN_IDENTITY` when several identities exist. Without
+a development identity it uses ad-hoc signing, which may require reauthorization
+after rebuilding. The script never resets permission records.

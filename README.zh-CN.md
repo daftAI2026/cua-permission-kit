@@ -40,6 +40,11 @@ CUA_RUN_WINDOW_TESTS=1 swift test
 屏幕捕获探针不单独证明仅音频权限。
 库不申请权限，不重置 TCC，不提权。
 Demo 从用户缓存目录运行，避免 Desktop 拖拽授权弹窗。
+先将旧 `dist/CUAPermissionDemo.app` 移到废纸篓。
+同标识的旧包会让系统设置重启错误版本。
+构建使用本机唯一 Apple Development 身份签署 Demo。
+多身份时用 `CUA_DEMO_SIGN_IDENTITY` 指定；无身份时使用临时签名。
+临时签名重建后可能需要重新授权，不自动清理系统条目。
 
 ## 已验证与边界
 

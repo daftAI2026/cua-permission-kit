@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# [INPUT]: 依赖 SwiftPM、macOS open 与本地演示目标。
+# [INPUT]: 依赖 SwiftPM、codesign、本机开发签名与演示图标。
 # [OUTPUT]: 在用户缓存目录构建并启动演示 App。
 # [POS]: 唯一演示启动入口；不触碰其他应用或系统权限。
 # [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
@@ -10,6 +10,24 @@ APP_NAME=CUAPermissionDemo
 BUNDLE_ID=org.cuapermissionkit.demo
 cd "$ROOT"
 case "$MODE" in run|--debug|--logs|--telemetry|--verify) ;; *) echo "usage: $0 [--debug|--logs|--telemetry|--verify]" >&2; exit 2 ;; esac
+# 同标识旧包会让系统设置重启错误版本；先拒绝混用，不自动删除。
+if [[ -d "$ROOT/dist/$APP_NAME.app" ]]; then
+    echo "Move the legacy dist/$APP_NAME.app to Trash before running this Demo." >&2
+    exit 1
+fi
+SIGN_IDENTITY="${CUA_DEMO_SIGN_IDENTITY:-}"
+if [[ -z "$SIGN_IDENTITY" ]]; then
+    IDENTITIES="$(security find-identity -v -p codesigning | awk '/"Apple Development:/ { print $2 }')"
+    if [[ "$IDENTITIES" =~ ^[[:xdigit:]]{40}$ ]]; then
+        SIGN_IDENTITY="$IDENTITIES"
+    elif [[ -z "$IDENTITIES" ]]; then
+        SIGN_IDENTITY="-"
+        echo "No Apple Development identity: ad-hoc builds may require reauthorization." >&2
+    else
+        echo "Multiple development identities: set CUA_DEMO_SIGN_IDENTITY explicitly." >&2
+        exit 1
+    fi
+fi
 pkill -x "$APP_NAME" >/dev/null 2>&1 || true
 swift build --product "$APP_NAME"
 BINARY="$(swift build --show-bin-path)/$APP_NAME"
@@ -40,6 +58,9 @@ cat > "$BUNDLE/Contents/Info.plist" <<PLIST
 <key>NSPrincipalClass</key><string>NSApplication</string>
 </dict></plist>
 PLIST
+# 完整包签名绑定标识与资源；不签其他应用，不添加 entitlement。
+codesign --force --sign "$SIGN_IDENTITY" --timestamp=none "$BUNDLE"
+codesign --verify --strict "$BUNDLE"
 case "$MODE" in
 run) /usr/bin/open -n "$BUNDLE" ;;
 --debug) lldb -- "$BUNDLE/Contents/MacOS/$APP_NAME" ;;
