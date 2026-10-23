@@ -14,6 +14,7 @@ let package = Package(
     targets: [
         .target(name: "CUAPermissionKit", exclude: ["CLAUDE.md"]),
         .executableTarget(name: "CUAPermissionDemo", dependencies: ["CUAPermissionKit"], path: "Examples/CUAPermissionDemo", exclude: ["CLAUDE.md"]),
-        .testTarget(name: "CUAPermissionKitTests", dependencies: ["CUAPermissionKit"], exclude: ["CLAUDE.md"])
+        .testTarget(name: "CUAPermissionKitTests", dependencies: ["CUAPermissionKit"], exclude: ["CLAUDE.md"]),
+        .testTarget(name: "CUAPermissionDemoTests", dependencies: ["CUAPermissionDemo"], exclude: ["CLAUDE.md"])
     ]
 )

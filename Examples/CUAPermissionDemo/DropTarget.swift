@@ -7,6 +7,7 @@ import AppKit
 @MainActor
 final class DropTarget: NSBox {
     var onAccepted: (() -> Void)?
+    private var acceptsDemoDrop = true
     private let label = NSTextField(wrappingLabelWithString: "Drop app here")
 
     override init(frame: NSRect) {
@@ -34,12 +35,15 @@ final class DropTarget: NSBox {
 
     required init?(coder: NSCoder) { fatalError("Use init(frame:)") }
 
-    func reset() { label.stringValue = "Drop app here" }
+    func reset(enabled: Bool = true) {
+        acceptsDemoDrop = enabled
+        label.stringValue = enabled ? "Drop app here" : "Complete access in System Settings"
+    }
 
-    override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation { .copy }
+    override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation { acceptsDemoDrop ? .copy : [] }
 
     override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
-        guard let raw = sender.draggingPasteboard.string(forType: .fileURL), let url = URL(string: raw) else { return false }
+        guard acceptsDemoDrop, let raw = sender.draggingPasteboard.string(forType: .fileURL), let url = URL(string: raw) else { return false }
         let matches = url.standardizedFileURL == Bundle.main.bundleURL.standardizedFileURL
         label.stringValue = matches ? "File URL verified" : "Unexpected file URL"
         if matches { onAccepted?() }
