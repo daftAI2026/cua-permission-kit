@@ -17,11 +17,12 @@ CUA describes the computer-use workflow; this package does not ship OpenAI binar
 
 ## Features
 
-- SwiftUI permission card hosted in AppKit.
-- Draggable application row, System Settings window tracking, and arrow hints.
-- Forward/back spring transitions, foreground snapshots, and RTL layout.
-- Per-instance app URL, display name, app icon, permission icon, and localized copy.
-- Typed user events and permission-state updates.
+- Two cards: Device Control & Data Access, and Screen & System Audio Recording.
+- Older macOS versions show Accessibility and Screen Recording where applicable.
+- Single-card integration by default; enable both cards through `permissions`.
+- Original card tokens, draggable application row, and spring animations preserved.
+- Recording icon loaded from the system, with an SF Symbol fallback.
+- Separate Demo controls using Radix color scales and centralized tokens.
 
 Swift Package Manager library. macOS 12+ deployment target. No external dependencies.
 The deployment target is not a claim of runtime verification on every macOS version.
@@ -39,6 +40,16 @@ cd cua-permission-kit
 The Demo starts in simulation mode. Choose **System Settings** to inspect real
 permissions. See [Demo](#demo) for the distinction.
 
+See [Integration](#integration) for the complete example and API reference.
+
+Verification commands:
+
+```sh
+swift test
+CUA_RUN_WINDOW_TESTS=1 swift test # Requires an interactive macOS session
+swift build -c release
+```
+
 ### Add the library
 
 Add `.package(path: "../cua-permission-kit")` to your package dependencies and
@@ -47,8 +58,8 @@ No remote release or version tag is required for local integration.
 
 ## When to show the guide
 
-**Complete authorization before the first main-app launch** when an installer or
-launcher provides onboarding. For an embedded guide, show it first; start screen
+**We recommend completing authorization before the first main-app launch** when an
+installer or launcher provides onboarding. For an embedded guide, show it first; start screen
 capture and automation only after the host process confirms access.
 
 Authorize the **final signed and installed app**, not its installer or helper.
