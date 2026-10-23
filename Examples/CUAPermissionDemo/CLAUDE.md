@@ -1,7 +1,7 @@
 # CUAPermissionDemo/
 > L2 | 父级: ../CLAUDE.md
 
-App.swift: AppKit 入口，创建菜单与演示控制器。
+App.swift: AppKit 入口，加载本包 Dock 图标、菜单与控制器。
 DemoController.swift: 组装控制面板；向会话转发用户操作。
 DemoSession.swift: 独占库接入、目标适配和只读探针；不申请权限。
 DemoPalette.swift: Radix 语义色阶与 0.5pt 边框按钮。

@@ -1,5 +1,5 @@
 // [INPUT]: 依赖 XCTest、AppKit 与演示目标。
-// [OUTPUT]: 验证系统设置模式拒绝模拟接收区完成。
+// [OUTPUT]: 验证 Dock 图标来源与设置模式拒绝模拟完成。
 // [POS]: 演示与真实授权状态的隔离回归测试。
 // [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
 import AppKit
@@ -7,6 +7,21 @@ import XCTest
 @testable import CUAPermissionDemo
 
 final class DemoIsolationTests: XCTestCase {
+    @MainActor func testDockIconUsesExplicitResource() throws {
+        let app = NSApplication.shared
+        let previous = app.applicationIconImage
+        defer { app.applicationIconImage = previous }
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let url = root.appendingPathComponent("Assets/DemoIcon.icns")
+        XCTAssertTrue(DemoApp.installDockIcon(at: url))
+        let installed = try XCTUnwrap(app.applicationIconImage?.tiffRepresentation)
+        XCTAssertFalse(DemoApp.installDockIcon(at: nil))
+        XCTAssertEqual(app.applicationIconImage?.tiffRepresentation, installed)
+        XCTAssertFalse(DemoApp.installDockIcon(at: root.appendingPathComponent("missing.icns")))
+        XCTAssertEqual(app.applicationIconImage?.tiffRepresentation, installed)
+        // Dock 的系统渲染不等于 ICNS 原始像素；真实外观另做截图验收。
+    }
+
     @MainActor func testSettingsModeRejectsDemoDropCompletion() throws {
         guard ProcessInfo.processInfo.environment["CUA_RUN_WINDOW_TESTS"] == "1" else { throw XCTSkip("Opt-in visible window test") }
         _ = NSApplication.shared

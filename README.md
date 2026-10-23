@@ -154,7 +154,7 @@ application-name injection and the multi-card default keyboard shortcut.
 This is source-block parity, not full pixel parity across macOS versions.
 
 Local acceptance on macOS 27.0.1 arm64: both real file drags into the Demo, independent
-completion, return animation and restart passed; 19 tests passed including seven
+completion, return animation and restart passed; 20 tests passed including seven
 opt-in window tests. Real system authorization changes, recording-specific Settings
 placement, older OS versions and multi-monitor behavior remain separate acceptance gates.
 
