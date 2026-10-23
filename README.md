@@ -30,9 +30,10 @@ No remote release or version tag is required for local integration.
 
 ## When to show the guide
 
-Complete permission onboarding **before starting the app's main features**, especially
-screen capture and automation. This avoids starting work that macOS may interrupt
-with a permission prompt or a relaunch request.
+**Prefer completing permission onboarding before the first main-app launch**,
+when an installer or launcher provides that flow. For an embedded guide, start only
+the onboarding UI and confirm access before starting screen capture or automation.
+This can reduce an extra restart after the user has begun work.
 
 If your installer or launcher offers onboarding before the first main-app launch,
 add the **final installed app bundle** to System Settings, not the installer or helper.
