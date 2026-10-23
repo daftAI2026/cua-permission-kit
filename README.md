@@ -11,6 +11,10 @@ displays the permission state supplied by the host application.
 **Independent community project. Not affiliated with or endorsed by OpenAI.**
 CUA describes the computer-use workflow; this package does not ship OpenAI binaries, icons, or an authorization service.
 
+[![Demo: drag both permission cards and restart](Assets/Demo.gif)](Assets/Demo.mp4)
+
+[Watch MP4](Assets/Demo.mp4) | 11.2s | 1080p
+
 ## Features
 
 - SwiftUI permission card hosted in AppKit.

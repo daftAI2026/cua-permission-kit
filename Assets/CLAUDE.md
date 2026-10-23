@@ -4,6 +4,8 @@
 DemoIcon.icon/: Icon Composer 源文件，保留用户黑白配色。
 DemoIcon.icns: 从源文件编译的旧系统静态图标。
 DemoIcon.png: 默认外观预览，随源文件重新导出。
+Demo.gif: README 内嵌演示预览，800×450，15fps。
+Demo.mp4: 精简版演示，1920×1080，60fps，11.2 秒。
 ufo.svg: 用户提供的飞碟轮廓，白色填充与图标留白。
 
 修改图标后，在 Icon Composer 保存源文件。

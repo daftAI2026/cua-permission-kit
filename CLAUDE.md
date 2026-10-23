@@ -2,7 +2,7 @@
 Swift 5.9 + SwiftUI + AppKit + Swift Package Manager
 
 <directory>
-Assets/ - Demo 图标源文件与兼容导出
+Assets/ - Demo 图标、兼容导出与演示视频
 Sources/ - 原生库源码（1 子目录：CUAPermissionKit）
 Examples/ - 双卡演示与只读权限探针
 script/ - 缓存目录构建与启动入口
