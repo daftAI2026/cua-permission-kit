@@ -14,7 +14,7 @@ Tests/ - 库与 Demo 独立测试（2 子目录：CUAPermissionKitTests、CUAPer
 AGENTS.md - 贡献规则、权限边界与验收命令。
 Package.swift - 声明 macOS 12+ 库和测试目标。
 README.md - 英文接入、文案协议与安全边界。
-README.zh-CN.md - 中文能力与验收边界。
+README.zh-CN.md - 中文快速开始、授权说明与安全提示。
 EXTRACTION_AUDIT.md - Incodex 提取差异与未关闭验收项。
 LICENSE - 保留提取来源的 MIT 版权声明。
 .gitignore - 排除构建缓存与本机状态。

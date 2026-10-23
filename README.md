@@ -33,7 +33,7 @@ cd cua-permission-kit
 ```
 
 The Demo starts in simulation mode. Choose **System Settings** to inspect real
-permissions. See [Demo and verification](#demo-and-verification) for the distinction.
+permissions. See [Demo](#demo) for the distinction.
 
 ### Add the library
 
@@ -54,27 +54,13 @@ bundles with the same ID can invalidate access.
 Early onboarding can reduce extra restarts, but does not eliminate them.
 Follow any macOS request to quit and reopen, especially for screen recording.
 
-## Scope and safety
+## Safety
 
-The library presents state; the host owns real authorization checks. It contains no
-TCC reset, privilege escalation, installer, networking, or OpenAI binaries.
-The locator reads System Settings window geometry. Screen recording uses the system
-recording icon when available, with an SF Symbol fallback; no Apple image is bundled.
-The two permission kinds have distinct Settings routes. The original Incodex source
-had only the Accessibility card wired up: the second card is an explicit extension,
-not a claim to reproduce an unpublished CUA recording implementation.
+The host checks authorization; the library displays the result. A click or file drop
+is not proof of access. The library does not reset TCC or request elevated privileges.
 
-The extracted card visual tokens and spring code remain unchanged. Radix colors,
-0.5pt borders and centralized Demo tokens apply only to the control panel.
-`ExtractionParityTests` fingerprints eight original visual/motion blocks, excluding
-application-name injection and the multi-card default keyboard shortcut.
-This is source-block parity, not full pixel parity across macOS versions.
-
-Local verification on 2026-10-23, macOS 27.0.1 arm64: both real file drags into the Demo, independent
-completion, return animation and restart passed; 21 tests passed including seven
-opt-in window tests. Both real permission probes also passed after removing the stale
-Demo entry and legacy bundle; a development-signed rebuild retained access. This does
-not certify old OS versions, multi-monitor placement, or every authorization transition.
+The Demo is built locally and is not Apple-notarized. Older macOS versions and
+multi-monitor placement remain unverified. See [verification details](EXTRACTION_AUDIT.md).
 
 ## Integration
 
@@ -136,6 +122,11 @@ The current presenter emits `.allow`, `.retry`, and `.later` (including window c
 Cancel permission checks when closing or changing cards; do not deliver a stale result
 for a previous `activePermission` to the current card.
 
+`permissions` defaults to `[.deviceControl]`; supply both cases for two cards.
+`activePermission` identifies the selected card. `.granted` completes it after the
+return animation; `returnToCard()` returns without granting access.
+`PermissionHandoffTarget` configures target geometry and activation (default: System Settings).
+
 ### Customization
 
 `PermissionConfiguration` accepts `applicationIcon`, `permissionIcon`, `rightToLeft`,
@@ -157,59 +148,17 @@ Supply the exact localized application name in your custom drag instruction.
 Enable it only in a dedicated short-lived helper process. Do not run multiple guide presenters
 in that mode. Close the guide before releasing it or shutting down its host.
 
-## Demo and verification
+## Demo
 
-```sh
-./script/build_and_run.sh
-swift test
-CUA_RUN_WINDOW_TESTS=1 swift test # interactive macOS session required
-```
+- **Demo**: drag the application into the drop area to simulate completion. No system permissions change.
+- **System Settings**: open the selected permission page. The optional read-only probe checks actual access; simulation buttons are not proof of authorization.
+- **Restart**: reset the preview, not system permissions.
 
-The Demo uses `DemoSession.applicationName` as its display-name variable (default: `"Demo"`).
-Changing this value updates the card and its generated instructions, not the bundle ID
-or the application URL used for dragging.
+Each card returns independently; completing both closes the guide. The recording
+probe checks screen-capture access, not a separate audio-only permission.
 
-The Demo offers English, Chinese and RTL previews, two permission cards, a destination
-selector, simulated results and **Restart**. Its default destination is the Demo drop
-area. Dropping the exact Demo application URL simulates completion of the selected card:
-it flies back, shows completed, and leaves the other card available. Completing both
-closes the guide. Restart resets only the demonstration, never system permissions.
-System Settings mode disables the Demo drop area; a simulated drop cannot complete
-a real Settings flow. Explicit “Simulate” buttons remain test controls, not permission proof.
-
-Select **System Settings** to use real Settings navigation. Changing the destination
-restarts an existing preview, so helper geometry, instructions and completion rules
-always use the displayed destination; system permissions are never reset.
-The optional read-only check uses `AXIsProcessTrusted` or
-`CGPreflightScreenCaptureAccess`; it never requests or resets authorization.
-A screen-capture preflight is not a separate guarantee of audio-only authorization.
-The app is staged in the user cache, not Desktop, to avoid a Desktop-folder access
-request when AppKit creates the file drag's sandbox extension.
-
-`permissions` defaults to `[.deviceControl]`. Supply both cases for two cards.
-`language` selects version-aware permission names. `activePermission` identifies the
-selected card. `.granted` completes that card after the return animation; the guide
-closes only after all cards complete. `returnToCard()` returns without granting.
-`PermissionHandoffTarget` supplies custom target geometry and activation; its default
-is System Settings. See `Examples/CUAPermissionDemo` for the complete adapter.
-
-## Library and Demo boundary
-
-Dependencies flow one way: `DemoController → DemoSession → CUAPermissionKit`.
-The controller composes Demo controls; the session owns target adaptation,
-simulated results, and read-only probes. Demo tokens, icons, and drop targets
-remain outside the library. Library and Demo tests use separate targets.
-
-[Source comparison and outstanding checks](EXTRACTION_AUDIT.md).
-
-### Demo build identity
-
-Trash the legacy `dist/CUAPermissionDemo.app` before using the Run script.
-Duplicate bundle IDs can make Settings reopen the older build. The script signs
-only the Demo bundle, using the unique local Apple Development identity when
-available. Set `CUA_DEMO_SIGN_IDENTITY` when several identities exist. Without
-a development identity it uses ad-hoc signing, which may require reauthorization
-after rebuilding. The script never resets permission records.
+Set `DemoSession.applicationName` to change the displayed name (default: `"Demo"`).
+See [the Demo source](Examples/CUAPermissionDemo) for the complete host adapter.
 
 ## Opening a trusted, unnotarized Demo
 
@@ -245,27 +194,6 @@ identity and may require granting access again. No `sudo`, global Gatekeeper cha
 stale Demo entry but the probe remains false, first confirm the running bundle path;
 remove and re-add only that Demo entry, never reset other apps' permissions.
 
-## Demo icon
-
-`Assets/DemoIcon.icon` is the editable Icon Composer source. It retains the supplied
-flying-saucer path and the maintainer's black-and-white glass treatment. `DemoIcon.png`
-is its exported preview; `DemoIcon.icns` is its compiled compatibility icon.
-The Demo loads its own bundle icon rather than a placeholder symbol.
-The run script compiles layered assets with Xcode 27; older toolchains use the static ICNS.
-After changing the icon, save in Icon Composer, export the PNG, compile the ICNS with
-`actool`, and update both exports together. The library has no dependency on these assets.
-
-## Release boundary
-
-This repository distributes a Swift source package. The Demo is a locally built example,
-not a Developer ID-signed or notarized downloadable application. A first source preview must pass
-release compilation, the external README integration build, CI and the opt-in window
-suite. Older macOS versions and multi-monitor placement remain unverified; these
-follow-up checks do not block the current source preview. The macOS 12 deployment
-target is a build setting, not evidence of runtime compatibility on every supported OS.
-The automated gates do not certify every system authorization transition.
-Tags and GitHub Releases require maintainer confirmation. No version tag is published yet.
-
 ## Contributing
 
 Read [AGENTS.md](AGENTS.md) for repository boundaries, development commands and
@@ -273,15 +201,7 @@ verification requirements. Keep changes scoped and include a regression test for
 behavior changes. Report the macOS version, build commit and selected Demo target
 when filing a reproducible issue; omit credentials and private screen contents.
 
-## Attribution
-
-Extracted from Incodex native macOS permission UI at
-`c7340c97f4d9ecd7b0035f50bac1f526dc34e477`.
-The existing MIT copyright notices are retained in [LICENSE](LICENSE).
-This repository contains the extracted implementation, not OpenAI's proprietary CUA source.
-
-Radix palette attribution is in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-
 ## License
 
-MIT. See [LICENSE](LICENSE) and [third-party notices](THIRD_PARTY_NOTICES.md).
+Extracted from Incodex under MIT. See [LICENSE](LICENSE),
+[third-party notices](THIRD_PARTY_NOTICES.md) and [source provenance](EXTRACTION_AUDIT.md).
