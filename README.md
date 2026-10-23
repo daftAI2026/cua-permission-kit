@@ -30,21 +30,16 @@ No remote release or version tag is required for local integration.
 
 ## When to show the guide
 
-**Prefer completing permission onboarding before the first main-app launch**,
-when an installer or launcher provides that flow. For an embedded guide, start only
-the onboarding UI and confirm access before starting screen capture or automation.
-This can reduce an extra restart after the user has begun work.
+**Complete authorization before the first main-app launch** when an installer or
+launcher provides onboarding. For an embedded guide, show it first; start screen
+capture and automation only after the host process confirms access.
 
-If your installer or launcher offers onboarding before the first main-app launch,
-add the **final installed app bundle** to System Settings, not the installer or helper.
-If the guide runs inside your app, launch only the onboarding UI first; start protected
-features after the actual host process confirms access. A helper's permissions are
-not proof that the main app is authorized.
+Authorize the **final signed and installed app**, not its installer or helper.
+Helper permissions do not authorize the main app. Re-signing or keeping duplicate
+bundles with the same ID can invalidate access.
 
-This can reduce an extra relaunch, but cannot guarantee a restart-free flow.
-Honor any macOS request to quit and reopen, especially for screen recording.
-Finish signing and installing the app before granting access; changing its identity
-or keeping multiple bundles with the same ID can invalidate the authorization.
+Early onboarding can reduce extra restarts, but does not eliminate them.
+Follow any macOS request to quit and reopen, especially for screen recording.
 
 ## Integration
 
