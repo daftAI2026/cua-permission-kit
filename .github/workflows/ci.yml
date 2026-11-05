@@ -29,7 +29,7 @@ jobs:
           base = os.environ.get("BASE_SHA", "")
           code = True
           if os.environ["EVENT_NAME"] != "workflow_dispatch" and base and set(base) != {"0"}:
-              result = subprocess.run(["git", "diff", "--name-only", "-z", base, "HEAD"], capture_output=True, check=True)
+              result = subprocess.run(["git", "diff", "--no-renames", "--name-only", "-z", base, "HEAD"], capture_output=True, check=True)
               paths = [p for p in result.stdout.decode().split("\0") if p]
               code = not paths or any(not p.endswith(".md") for p in paths)
           with open(os.environ["GITHUB_OUTPUT"], "a") as output:
@@ -45,9 +45,6 @@ jobs:
           SCOPE_RESULT: ${{ needs.changes.result }}
         run: test "$SCOPE_RESULT" = success
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      - name: Build Debug and measure unchanged rebuild
-        run: |
-          time swift build
-          time swift build
+      - run: swift build
       - run: swift test
       - run: swift build -c release
