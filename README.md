@@ -127,3 +127,5 @@ Do not upload credentials or screenshots containing private content.
 
 Extracted from Incodex under the MIT license. See [LICENSE](LICENSE),
 [third-party notices](THIRD_PARTY_NOTICES.md), and [source provenance](EXTRACTION_AUDIT.md).
+
+<!-- CI documentation fast-path verification; this probe is not merged. -->
